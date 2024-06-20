@@ -11,7 +11,7 @@ services:
     # network_mode: "host"
     volumes:
       - .:/app
-      - /mnt/caches:/mnt/caches
+      - /Users/ajabhish/caches:/mnt/caches
     command: >
       sh -c ". bin/startup.sh"
     stdin_open: true

@@ -269,6 +269,7 @@ f'''
             import_tree_prompt=import_tree_prompt,
             file_paths_in_query=", ".join(self.relevant_file_paths),
         )
+        print("formatted user prompt in context prunning.py: ", user_prompt)
         return user_prompt
 
     def get_highest_scoring_snippet(self, file_path: str) -> Snippet:
@@ -602,6 +603,7 @@ def generate_file_imports(graph,
 def parse_query_for_files(
     query: str, rcm: RepoContextManager
 ) -> tuple[RepoContextManager, nx.DiGraph]:
+    print(f"calling parse_query_for_files with: {locals()}")
     MAX_FILES_TO_ADD = 5
     code_files_to_add = []
     code_files_to_check = set(list(rcm.cloned_repo.get_file_list()))

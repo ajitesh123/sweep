@@ -764,6 +764,17 @@ def get_files_to_change(
             response_cleanup=cleanup_fcrs,
             MAX_CALLS=10
         )
+        content=joint_message + "\n\n" + issue_sub_request_prompt
+        print()
+        print()
+        print()
+        print(f"================issue_sub_request=================")
+        print(f"prompt: {content}")
+        print(f"response: {issue_sub_request_response}")
+        print()
+        print()
+        print()
+        print("==============================================")
         issue_sub_request_pattern = re.compile(r"<issue_sub_requests>(.*?)</issue_sub_requests>", re.DOTALL)
         issue_sub_request_match = issue_sub_request_pattern.search(issue_sub_request_response)
         if not issue_sub_request_match:
@@ -803,6 +814,17 @@ def get_files_to_change(
         MAX_CALLS=10
     )
     # get the issue analysis from the proposed plan response
+    content=joint_message + "\n\n" + proposed_plan_prompt.format(issue_sub_requests=issue_sub_requests)
+    print()
+    print()
+    print(f"""
+    ========================================================
+    ================= Proposed Plan ========================
+    proposed_plan_response: {proposed_plan_response}
+    proposed plan prompt: {content}
+    ========================================================
+    """)
+
     issue_analysis_and_proposed_changes, failed , _ = extract_object_fields_from_string(proposed_plan_response, ["issue_analysis"])
 
     # TODO: add error case for no issue_analysis
@@ -828,6 +850,20 @@ def get_files_to_change(
         response_cleanup=cleanup_fcrs,
         MAX_CALLS=10
     )
+    # get the issue analysis from the proposed plan response
+    content=joint_message + "\n\n" + plan_generation_steps_prompt.format(
+        issue_analysis_and_proposed_changes=issue_analysis_and_proposed_changes
+    )
+    print()
+    
+    print(f"""
+    ========================================================
+    ================ Plan Generation Steps =================
+    files_to_change_response: {files_to_change_response}
+    files_to_change_response prompt: {content}
+    ========================================================
+    """)
+    
     relevant_modules = []
     pattern = re.compile(r"<relevant_modules>(.*?)</relevant_modules>", re.DOTALL)
     relevant_modules_match = pattern.search(files_to_change_response)
@@ -2023,3 +2059,4 @@ def get_files_to_change_for_gha(
         print("RegexMatchError", e)
 
     return [], ""
+

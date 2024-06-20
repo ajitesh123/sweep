@@ -65,6 +65,7 @@ class OpenAIProxy:
         stop_sequences: list[str] = [],
         seed: int = 0,
     ):
+        print(f"Open AI called: {locals()}")
         try:
             engine = self.determine_openai_engine(model)
             if OPENAI_API_TYPE is None or engine is None:
@@ -124,6 +125,9 @@ class OpenAIProxy:
                         f"Calling {model} with engine {engine} on Azure url {region_url}."
                     )
                     with Timer():
+                        print(f"Open AI called: {model}")
+                        # Adding a debug print statement to display parameters
+                        print(f"Parameters used: engine={engine}, base_url={region_url}, api_key=***** (hidden), model={model}, messages={messages}, tools={tools}, max_tokens={max_tokens}, temperature={temperature}")
                         response = self.create_openai_chat_completion(
                             engine=engine,
                             base_url=region_url,
@@ -134,6 +138,7 @@ class OpenAIProxy:
                             max_tokens=max_tokens,
                             temperature=temperature,
                         )
+                        print(f"Open AI response: {response}")
                         return response.choices[0].message.content
                 except (RateLimitError, APITimeoutError, InternalServerError) as e:
                     logger.exception(f"RateLimitError calling {region_url}: {e}")

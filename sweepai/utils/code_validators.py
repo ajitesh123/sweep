@@ -18,7 +18,7 @@ from pylint.reporters.text import TextReporter
 from loguru import logger
 from tree_sitter import Node, Parser, Language
 from tree_sitter_languages import get_parser as tree_sitter_get_parser
-import tree_sitter_python
+#import tree_sitter_python
 import tree_sitter_javascript
 
 from sweepai.core.entities import Snippet
@@ -31,10 +31,11 @@ AVG_CHAR_IN_LINE = 60
 
 def get_parser(language: str):
     parser = Parser()
-    if language in ("python", "py"):
-        lang = Language(tree_sitter_python.language(), "python")
-    elif language in ("javascript", "js"):
+    if language in ("javascript", "js"):
         lang = Language(tree_sitter_javascript.language(), "javascript")
+    elif language in ("python", "py"):
+        pass
+        #lang = Language(tree_sitter_python.language(), "python")
     else:
         return tree_sitter_get_parser(language)
     parser.set_language(lang)

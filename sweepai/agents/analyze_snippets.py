@@ -72,10 +72,13 @@ class AnalyzeSnippetAgent(ChatGPT):
     @majority_vote_decorator(num_samples=2, voting_func=snippet_majority_vote) # unsure about 3 vs 1
     def analyze_snippets(self, snippets: list[Snippet], type_name: str, issue: str, seed: int=0):
         # should a subset of the relevant snippets from a slice of the repo
+        print(f"Analyzing snippet called with: {locals()}")
         snippet_text = self.format_code_snippets(snippets)
         system_prompt = analyze_system_prompt.format(issue=issue, type_name=type_name, explanation=type_to_explanation[type_name])
         self.messages = [Message(role="system", content=system_prompt)]
         user_prompt = analyze_user_prompt.format(issue=issue, type_name=type_name, explanation=type_to_explanation[type_name], snippet_text=snippet_text)
+        print(f"prompt for analyzing snippet: {user_prompt}")
+        print(f"messages for analyse snippet: {self.messages}")
         analyze_response = self.chat_anthropic(
             content=user_prompt,
             temperature=0.3, # we have majority voting

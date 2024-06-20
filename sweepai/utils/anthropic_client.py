@@ -53,6 +53,7 @@ class AnthropicClient:
     # returns the clients response object
     @file_cache(ignore_params=["self"])
     def get_response_message(self, messages: list[dict[str, str]], model: str = "", stop_sequences: list[str] = [], **kwargs):
+        print(f"Called Anthripoic get_response_message: {locals()}")
         model = model or self.model
         # for anthropic the messages must be alternating user and assistant and we cannot have system as a role
         if OPENAI_API_TYPE == "anthropic":
@@ -60,6 +61,7 @@ class AnthropicClient:
             response = self.client.messages.create(messages=messages, model=model, stop_sequences=stop_sequences, **kwargs)
         else:
             response = self.client.chat.completions.create(messages=messages, model=model, stop=stop_sequences, **kwargs)
+        print(f"Response from anthropic model: {response}")
         return response
     
     # returns the role and content from the response

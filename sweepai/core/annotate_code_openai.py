@@ -70,6 +70,15 @@ class AnnotateCodeBot(ChatGPT):
                 model=CLAUDE_MODEL,
                 verbose=False
             )
+            print(f"=============================")
+            print(f"==============annotate code pattern ===================")
+            print(f"prompt: {user_prompt}")
+            content=user_prompt.format(
+                    source_code=source_code.strip("\n"),
+                    issue=issue_text.strip("\n"),
+                    code_to_annotate=code_to_annotate.strip("\n"))
+            print(f"print prompt for anthropic for code annotation: {content}")
+            print(f"code annotation response: {code_annotation_response}")
         except Exception as e:
             logger.warning(f"AnnotateCodeBot failed with error: {e}")
             return ""

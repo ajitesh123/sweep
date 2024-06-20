@@ -146,6 +146,7 @@ def multi_get_top_k_snippets(
     Handles multiple queries at once now. Makes the vector search faster.
     """
     yield "Fetching configs...", [], [], []
+    print(f" Called multi_get_top_k_snippets with arguments: {locals()}")
     sweep_config: SweepConfig = SweepConfig()
     blocked_dirs = get_blocked_dirs(cloned_repo.repo)
     sweep_config.exclude_dirs += blocked_dirs
@@ -211,6 +212,7 @@ def get_top_k_snippets(
     *args,
     **kwargs,
 ):
+    print(f"using get_top_k_snippets: {locals()}")
     # Kinda cursed, we have to rework this
     for message, ranked_snippets_list, snippets, content_to_lexical_score_list in multi_get_top_k_snippets.stream(
         cloned_repo, [query], k, do_not_use_file_cache=do_not_use_file_cache, use_repo_dir=use_repo_dir, seed=seed, *args, **kwargs
@@ -230,6 +232,7 @@ def get_pointwise_reranked_snippet_scores(
     Ranks 6-100 are reranked using Cohere. Then we divide the scores by 1_000_000 to make them comparable to the original scores.
     """
 
+    print(f"called get_pointwise_reranked_snippet_scores with arguments: {locals()}")
     if not COHERE_API_KEY and not VOYAGE_API_KEY:
         return snippet_scores
 
@@ -390,6 +393,14 @@ def multi_prep_snippets(
                 filtered_subset_snippets.append(snippet)
             if type_name != "source" and filtered_subset_snippets and not skip_analyze_agent: # do more filtering
                 filtered_subset_snippets = AnalyzeSnippetAgent().analyze_snippets(filtered_subset_snippets, type_name, queries[0])
+                """
+                In the provided code, AnalyzeSnippetAgent().analyze_snippets() is used for additional filtering of the reranked snippets. /
+                It is called within the multi_prep_snippets function when the following conditions are met:
+
+                1. skip_analyze_agent is False (i.e., the analyze agent should be used).
+                2. The current snippet type being processed is not "source".
+                3. There are filtered subset snippets available for the current snippet type.
+                """
             logger.info(f"Length of filtered subset snippets for {type_name}: {len(filtered_subset_snippets)}")
             all_snippets.extend(filtered_subset_snippets)
         # if there are no snippets because all of them have been filtered out we will fall back to adding the highest rated ones
@@ -493,6 +504,7 @@ def get_relevant_context(
             end=len(content.split("\n")),
             content=content,
         )
+        print(f"Read only file: {read_only_file}")
         repo_context_manager.read_only_snippets.append(snippet)
     if not repo_context_manager.current_top_snippets and not repo_context_manager.read_only_snippets:
         repo_context_manager.current_top_snippets = copy.deepcopy(previous_top_snippets)
@@ -514,6 +526,7 @@ def fetch_relevant_files(
     chat_logger,
     images = None
 ):
+    print(f"Fetching relevant files with argument: {locals()}")
     logger.info("Fetching relevant files...")
     try:
         search_query = f"{title}\n{summary}\n{replies_text}".strip("\n")
@@ -533,8 +546,9 @@ def fetch_relevant_files(
         # yield "Here are the initial search results. I'm currently looking for files that you've explicitly mentioned.\n", repo_context_manager
 
         # repo_context_manager, import_graph = integrate_graph_retrieval(search_query, repo_context_manager)
-
+        print(f"current_top_snippets: {repo_context_manager.current_top_snippets}")  
         parse_query_for_files(search_query, repo_context_manager)
+        print(f"parse_query_for_files: {parse_query_for_files}")
         repo_context_manager = add_relevant_files_to_top_snippets(repo_context_manager)
         yield "Here are the files I've found so far. I'm currently selecting a subset of the files to edit.\n", repo_context_manager
 

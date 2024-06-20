@@ -15,14 +15,22 @@ RUN apt-get update \
 
 RUN gem install github-linguist
 
-RUN curl -LO https://github.com/BurntSushi/ripgrep/releases/download/13.0.0/ripgrep_13.0.0_amd64.deb && \
-    dpkg -i ripgrep_13.0.0_amd64.deb && \
-    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y 
+# Install Rust and set the PATH
+RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 ENV PATH="/root/.cargo/bin:${PATH}"
-RUN git clone https://github.com/BurntSushi/ripgrep
-RUN cd ripgrep && \
+
+# Install the correct ARM64 version of ripgrep
+RUN curl -LO https://github.com/microsoft/ripgrep-prebuilt/releases/download/v13.0.0-10/ripgrep-v13.0.0-10-aarch64-apple-darwin.tar.gz && \
+    tar -xzf ripgrep-v13.0.0-10-aarch64-apple-darwin.tar.gz && \
+    mv rg /usr/local/bin/ && \
+    rm -rf ripgrep-v13.0.0-10-aarch64-apple-darwin.tar.gz
+
+# Clone and build ripgrep from source
+RUN git clone https://github.com/BurntSushi/ripgrep && \
+    cd ripgrep && \
     cargo build --release && \
     ./target/release/rg --version
+
 
 ENV VIRTUAL_ENV=/usr/local
 RUN curl -sSL https://astral.sh/uv/install.sh -o /install.sh && chmod 755 /install.sh && /install.sh && rm /install.sh

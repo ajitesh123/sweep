@@ -256,6 +256,9 @@ class ChatGPT(MessageList):
         requested_max_tokens: int | None = None,
         stop_sequences: list[str] = [],
     ):
+        print(f"===================================")
+        print(f"Calling Openai model: {locals()}")
+        print(f"===================================")
         model = determine_model_from_chat_logger(chat_logger=self.chat_logger, model=model)
         if model not in model_to_max_tokens:
             raise ValueError(f"Model {model} not supported")
@@ -280,6 +283,9 @@ class ChatGPT(MessageList):
             if message_dict["role"] == messages_dicts[-1]["role"]:
                 messages_dicts[-1]["content"] += "\n" + message_dict["content"]
             messages_dicts.append(message_dict)
+        print(f"===================================")
+        print(f"Open AI called with messages: {messages_dicts}")
+        print(f"===================================")
         max_tokens = min(max_tokens, 4096)
         max_tokens = (
             min(requested_max_tokens, max_tokens)
@@ -347,8 +353,12 @@ class ChatGPT(MessageList):
 
         result = fetch()
         logger.info(f"Output to call openai:\n{result}")
+        print(f"===================================")
+        print(f"Open result: {result}")
+        print(f"===================================")
         return result
     
+    #claude-3-opus-20240229
     def chat_anthropic(
         self,
         content: str,
@@ -364,6 +374,11 @@ class ChatGPT(MessageList):
         stream: bool = False,
         seed: int | None = None,
     ) -> str | Iterator[str]:
+        print(f"===================================")
+        print(f"Calling Anthropic model")
+        print(f"Content: {content}")
+        print(f"assisstant message: {assistant_message_content}")
+        print(f"===================================")
         if not os.environ.get("ANTHROPIC_API_KEY") and not ANTHROPIC_AVAILABLE:
             use_openai = True
         if use_openai:
@@ -506,6 +521,8 @@ class ChatGPT(MessageList):
                             temperature=temperature,
                             stream=True,
                         )
+                        print("==========================")
+                        print(f"messages: {self.messages_dicts}")
                         streamed_text = ""
                         text = ""
                         for chunk in response:
@@ -608,6 +625,7 @@ class ChatGPT(MessageList):
         except Exception as e:
             logger.exception(f"Failed to save messages for visualization due to {e}")
         self.prev_message_states.append(self.messages)
+        print(f"Response from anthropic: {self.messages[-1].content}")
         return self.messages[-1].content
 
     @property
@@ -672,7 +690,7 @@ def continuous_llm_calls(
         response = response[:last_line_index].rstrip()
         last_k_lines = response.split("\n")[-10:]
         if use_openai:
-            content = "Continue generating starting here, DO NOT restart:\n\n" + "\n".join(last_k_lines)
+            content = "Continue generating. DO NOT restart from scratch. Here is the last part of your response to continue from:\n\n" + "\n".join(last_k_lines)
         chat_gpt.messages[-1].content = response_cleanup(response)
         # ask for a second response
         try:
@@ -691,3 +709,4 @@ def continuous_llm_calls(
             logger.error(f"Failed to get second response due to {e}")
         num_calls += 1
     return response
+

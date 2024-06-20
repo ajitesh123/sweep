@@ -484,6 +484,9 @@ class EmptyRepository(Exception):
 
 
 def parse_fcr(fcr: "FileChangeRequest"):
+    print(f"===================================")
+    print(f"parse_fcr is called with {locals()}")
+    print(f"===================================")
     justification, *_ = fcr.instructions.split("<original_code>", 1)
     justification, *_ = justification.split("<new_code>", 1)
     justification = justification.rstrip().removesuffix("1.").removesuffix("2.").rstrip() # sometimes Claude puts 1. <original_code> which is weird
@@ -493,6 +496,15 @@ def parse_fcr(fcr: "FileChangeRequest"):
     new_code_matches = list(re.finditer(new_code_pattern, fcr.instructions, re.DOTALL))
     replace_all_pattern = r"<replace_all>true</replace_all>"
     replace_all_matches = list(re.finditer(replace_all_pattern, fcr.instructions, re.DOTALL))
+    print(f"===================================")
+    print(f"""
+        justification: {justification.strip()},
+        file_path: {fcr.filename},
+        original_code: {[strip_triple_quotes(original_code_match.group(1)) for original_code_match in original_code_matches]},
+        new_code: {[strip_triple_quotes(new_code_match.group(1)) for new_code_match in new_code_matches]},
+        replace_all: {bool(replace_all_matches)},
+        """)
+    print(f"===================================")
     return {
         "justification": justification.strip(),
         "file_path": fcr.filename,
@@ -501,12 +513,23 @@ def parse_fcr(fcr: "FileChangeRequest"):
         "replace_all": bool(replace_all_matches),
     }
 
-
 def render_fcrs(file_change_requests: list["FileChangeRequest"]):
     # Render plan start
+    print(f"Plan to make {len(file_change_requests)} changes called render_fcrs: {locals()}")
     planning_markdown = ""
+    print(f"===========================================")
+    print(f"===========================================")
+    print(f"===========================================")
+    print(f"file_change_requests: {file_change_requests}")
+    print(f"===========================================")
+    print(f"===========================================")
+    print(f"===========================================")
     for fcr in file_change_requests:
+        print(f"fcr")
+        print(f"=====\n{fcr}\n=====")
         parsed_fcr = parse_fcr(fcr)
+        print(f"parsed_fcr")
+        print(f"=====\n{parsed_fcr}\n=====")
         if parsed_fcr and parsed_fcr["new_code"]:
             planning_markdown += f"#### `{fcr.filename}`\n"
             planning_markdown += f"{blockquote(parsed_fcr['justification'])}\n\n"
@@ -522,4 +545,7 @@ def render_fcrs(file_change_requests: list["FileChangeRequest"]):
             planning_markdown += (
                 f"#### `{fcr.filename}`\n{blockquote(fcr.instructions)}\n"
             )
+    print(f"=====\n{planning_markdown}\n=====")
+    print(f"plan_markdown: {planning_markdown}")
+    print(f"=====\n{planning_markdown}\n=====")
     return planning_markdown

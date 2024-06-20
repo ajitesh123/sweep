@@ -293,6 +293,8 @@ def get_comment_header(
 
 
 def process_summary(summary, issue_number, repo_full_name, installation_id):
+    logger.info("Understanding what processing summary doing...")
+    print(f"before processing summary: {summary}")
     summary = summary or ""
     summary = re.sub(
         "<details (open)?>(\r)?\n<summary>Checklist</summary>.*",
@@ -327,6 +329,7 @@ def process_summary(summary, issue_number, repo_full_name, installation_id):
                 -1
             ]
         SweepConfig.get_branch(repo, overrided_branch_name)
+    print(f"after processing summary: {summary}")
     return (
         summary,
         repo_name,
@@ -342,6 +345,7 @@ def process_summary(summary, issue_number, repo_full_name, installation_id):
 def raise_on_no_file_change_requests(
     title, summary, edit_sweep_comment, file_change_requests, renames_dict
 ):
+    print(f"file_change_requests called: {locals()}")
     if not file_change_requests and not renames_dict:
         if len(title + summary) < 60:
             edit_sweep_comment(

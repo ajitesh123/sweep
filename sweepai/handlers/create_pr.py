@@ -45,6 +45,9 @@ def handle_file_change_requests(
     previous_modify_files_dict: dict = {},
     renames_dict: dict = {},
 ):
+    print(f"=====================")
+    print(f"handled file change requests called: {locals()}")
+    print(f"=====================")
     organization, repo_name = cloned_repo.repo.full_name.split("/")
     metadata = {
         "repo_full_name": cloned_repo.repo.full_name,
