@@ -63,6 +63,8 @@ def modify(
     }
     full_instructions = instructions + modify_tools
     chat_gpt.messages = [Message(role="system", content=full_instructions)]
+    print(f"<system message for modify start> \n {full_instructions}")
+    print(f"</system message for modify end>")
     try:
         if compiled_fcr := compile_fcr(fcrs[0], 0):
             chat_gpt.messages.append(Message(role="user", content=f"Here is the initial user request, plan, and state of the code files:\n{user_message}"))
@@ -75,6 +77,10 @@ def modify(
             # update state if it's bad
             # TODO: handling logic to be moved out
             function_call: AnthropicFunctionCall = validate_and_parse_function_call(function_calls_string, chat_gpt) # this will raise if it's bad but compile_fcr should guarantee it's good
+            print(f"<Modify user_message start>: Here is the initial user request, plan, and state of the code files \n {user_message}")
+            print(f"</user_message end>")
+            print(f"<function_calls_string start>: \n {function_calls_string}")
+            print(f"</function_calls_string end>")
         else:
             model = MODEL
             logger.info(f"Using model: {model}")

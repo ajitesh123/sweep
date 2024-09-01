@@ -241,11 +241,12 @@ def on_ticket(
                 cloned_repo=cloned_repo,
                 images=image_contents,
                 chat_logger=chat_logger
-            ):
+            ):  
+                print(f"<file_change_request - Start>: \n \n {file_change_requests}")
+                print(f"\n </file_change_request - End>")
                 planning_markdown = render_fcrs(file_change_requests)
-                print(f"=======================================")
-                print(f"planning_markdown: {planning_markdown}")
-                print(f"=======================================")
+                print(f"<planning_markdown - Start>: \n \n {planning_markdown}")
+                print(f"\n </planning_markdown - End>")
                 edit_sweep_comment=""
             raise_on_no_file_change_requests(title, summary, edit_sweep_comment, file_change_requests, renames_dict)
         except Exception as e:
@@ -268,6 +269,8 @@ def on_ticket(
             pull_request.branch_name = create_branch(
                 cloned_repo.repo, pull_request.branch_name, base_branch=overrided_branch_name
             )
+            print(f"<file_change_requests - Start>: \n \n {file_change_requests}")
+            print(f"\n </file_change_requests - End>")
             modify_files_dict, changed_file, file_change_requests = handle_file_change_requests(
                 file_change_requests=file_change_requests,
                 request=issue_request,
@@ -276,6 +279,12 @@ def on_ticket(
                 installation_id=installation_id,
                 renames_dict=renames_dict
             )
+            print(f"<file_change_requests - Start>: \n \n {file_change_requests}")
+            print(f"\n </file_change_requests - End>")
+            print(f"<modify_files_dict - Start>: \n \n {modify_files_dict}")
+            print(f"\n </modify_files_dict - End>")
+            print(f"<changed_file - Start>: \n \n {changed_file}")
+            print(f"\n </changed_file - End>")
             pull_request_bot = PRSummaryBot()
             commit_message = pull_request_bot.get_commit_message(modify_files_dict, renames_dict=renames_dict, chat_logger=chat_logger)[:50]
             modify_files_dict_history.append(copy.deepcopy(modify_files_dict))

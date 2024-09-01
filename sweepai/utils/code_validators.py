@@ -33,8 +33,8 @@ def get_parser(language: str):
     parser = Parser()
     if language in ("javascript", "js"):
         lang = Language(tree_sitter_javascript.language(), "javascript")
-    elif language in ("python", "py"):
-        pass
+    # elif language in ("python", "py"):
+    #     pass
         #lang = Language(tree_sitter_python.language(), "python")
     else:
         return tree_sitter_get_parser(language)
